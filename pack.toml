@@ -1,0 +1,4 @@
+[package]
+name = "Idris2-Multiset0"
+version = "0.1.0"
+ipkg = "Idris2-Multiset0.ipkg"
