@@ -10,5 +10,7 @@ modules = Math.Interfaces
         , Math.BoxInt
         , Math.Singleton.Sing
         , Math.Singleton.Bit
+        , Math.DepMultiset
+        , Math.LMultiset
 
 sourcedir = "src"
