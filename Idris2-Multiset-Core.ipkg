@@ -1,4 +1,4 @@
-package Idris2-Multiset0
+package Idris2-Multiset-Core
 version = 0.1.0
 authors = "Justin Kelly"
 brief   = "Layer 0 Ground Linear QTT Multiset Memory Kernel."
