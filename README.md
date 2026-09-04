@@ -4,8 +4,8 @@
 
 `Idris2-Multiset-Core` provides the core discrete mathematical primitives for the **Constructive Multiset Physics Framework**:
 - `BoxInt`: Signed integer counts wrapped in discrete boxes ($v \in \mathbb{Z}$).
-- `UnixelFraction`: Exact rational fractions ($p/q \in \mathbb{Q}_{>0}$) with cross-multiplication equivalence (`rationalEquiv`).
-- `Box a`: Balanced binary multiset trees mapping key states to integer counts.
+- `Multiset`: Pure discrete multiset containers mapping key states to integer counts.
+- `Sing` / `Bit`: Singleton container wrappers and discrete binary boolean logic ($\mathbb{F}_2$).
 
 ---
 
