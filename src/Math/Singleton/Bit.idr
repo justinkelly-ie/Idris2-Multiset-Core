@@ -3,7 +3,7 @@ module Math.Singleton.Bit
 import Data.Linear
 import Math.Interfaces
 import Math.BoxInt
-import Math.Multiset
+import public Math.Multiset
 import public Math.Singleton.Sing
 
 %default total
