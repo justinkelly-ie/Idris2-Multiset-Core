@@ -12,5 +12,6 @@ modules = Math.Interfaces
         , Math.Singleton.Bit
         , Math.DepMultiset
         , Math.LMultiset
+        , Core.ScaleTransform
 
 sourcedir = "src"
