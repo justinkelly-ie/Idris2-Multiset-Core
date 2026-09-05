@@ -20,7 +20,7 @@ data Multiset1 : (c : Type) -> (a : Type) -> Type where
 
 public export
 insertItem : (Eq a, Num c, Eq c) => a -> c -> Multiset c a -> Multiset c a
-insertItem k v ZeroM = AddM k v ZeroM
+insertItem k v ZeroM = if v == 0 then ZeroM else AddM k v ZeroM
 insertItem k v (AddM k' v' rest) =
   if k == k' then
     let newV = v + v'
