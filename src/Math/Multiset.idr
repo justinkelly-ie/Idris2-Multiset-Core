@@ -61,6 +61,33 @@ Functor (Multiset c) where
   map = mapMultiset
 
 public export
+Bifunctor Multiset where
+  bimap f g ZeroM = ZeroM
+  bimap f g (AddM x c xs) = AddM (g x) (f c) (bimap f g xs)
+
+public export
+Foldable (Multiset c) where
+  foldr f z ZeroM = z
+  foldr f z (AddM x _ xs) = f x (foldr f z xs)
+
+  foldMap f ZeroM = neutral
+  foldMap f (AddM x _ xs) = f x <+> foldMap f xs
+
+public export
+Traversable (Multiset c) where
+  traverse f ZeroM = pure ZeroM
+  traverse f (AddM x c xs) = [| AddM (f x) (pure c) (traverse f xs) |]
+
+public export
+Semigroup (Multiset c a) where
+  (<+>) = addMultiset
+
+public export
+Monoid (Multiset c a) where
+  neutral = ZeroM
+
+
+public export
 annihilateMultiset : (Eq a, Num c, Eq c) => Multiset c a -> Multiset c a
 annihilateMultiset xs = go ZeroM xs
   where

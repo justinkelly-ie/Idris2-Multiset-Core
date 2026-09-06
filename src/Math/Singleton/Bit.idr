@@ -38,6 +38,7 @@ Eq Bit where
   _              == _              = True
 
 public export
+[overlapping]
 Show Bit where
   show b = if isOne b then "1" else "0"
 
@@ -94,6 +95,11 @@ bitToInteger b = if isOne b then 1 else 0
 public export
 bitToBoxInt : Bit -> BoxInt
 bitToBoxInt b = if isOne b then 1 else 0
+
+public export
+boolToBit : Bool -> Bit
+boolToBit True  = One
+boolToBit False = Zero
 
 public export
 normalize : Bit -> Bit
