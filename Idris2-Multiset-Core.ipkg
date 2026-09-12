@@ -14,5 +14,7 @@ modules = Math.Interfaces
         , Math.DepMultiset
         , Math.LMultiset
         , Core.ScaleTransform
+        , Core.Order.Preorder
+        , Core.Order.GaloisConnection
 
 sourcedir = "src"
