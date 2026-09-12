@@ -8,6 +8,7 @@ depends = base, linear
 modules = Math.Interfaces
         , Math.Multiset
         , Math.BoxInt
+        , Math.Spread
         , Math.Singleton.Sing
         , Math.Singleton.Bit
         , Math.DepMultiset
