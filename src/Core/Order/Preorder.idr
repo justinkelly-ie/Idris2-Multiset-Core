@@ -7,9 +7,17 @@ module Core.Order.Preorder
 --------------------------------------------------------------------------------
 
 ||| Exact structural less-than-or-equal comparison for Nat reducing at compile time.
-public export
+%inline public export
 natLTE : Nat -> Nat -> Bool
-natLTE x y = x <= y
+natLTE Z _ = True
+natLTE (S _) Z = False
+natLTE (S k) (S j) = natLTE k j
+
+||| Monomorphic addition for Nat reducing at compile time without typeclass dispatch.
+%inline public export
+natAdd : Nat -> Nat -> Nat
+natAdd Z y = y
+natAdd (S k) y = S (natAdd k y)
 
 --------------------------------------------------------------------------------
 -- 2. BOUNDED PRE-ORDERED MONOIDS & POSETS
