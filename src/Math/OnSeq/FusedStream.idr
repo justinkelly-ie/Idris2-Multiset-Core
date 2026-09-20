@@ -106,6 +106,11 @@ filterStream {a} p (MkStream {s} next seed) = MkStream nextStep seed
       Skip st' => Skip st'
       Yield x st' => if p x then Yield x st' else Skip st'
 
+||| Alias for deforested stream sifting operator.
+%inline public export
+siftFusedStream : (a -> Bool) -> FusedStream a -> FusedStream a
+siftFusedStream = filterStream
+
 ||| Deforested stream zipWith operator.
 %inline public export
 zipWithStream : (a -> b -> c) -> FusedStream a -> FusedStream b -> FusedStream c
