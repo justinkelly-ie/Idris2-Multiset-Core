@@ -3,6 +3,8 @@ module Core.MultisetTensor
 import public Core.BoxInt
 import public Math.Multiset
 import Math.OnSeq.FusedStream
+import Core.Order.Preorder
+import Data.Fuel
 import Data.List
 
 %default total
@@ -70,3 +72,68 @@ chromometricQuadrance Elliptic   dx dy dz = addBox (addBox (dx * dx) (dy * dy)) 
 chromometricQuadrance Hyperbolic dx dy dz = addBox (subBox (addBox (dx * dx) (dy * dy)) (dz * dz)) 1
 chromometricQuadrance Parabolic  dx dy dz = addBox (addBox (dx * dx) (dy * dy)) 1
 chromometricQuadrance Substrate  _  _  _  = 1
+
+------------------------------------------------------------------------
+-- 1. COMPILE-TIME TENSOR RANK WITNESSES (dim <= 27)
+------------------------------------------------------------------------
+
+||| Erased compile-time proof witness verifying multiset tensor dimension rank bound (dim <= 27).
+public export
+0 TensorAdjunctionWitness : (dim : Nat) -> Type
+TensorAdjunctionWitness dim = natLTE dim 27 = True
+
+||| Static compile-time witness for 27-element triadic tensor rank (27 <= 27).
+public export
+0 prfMultisetTensorAdjunctionRank27 : TensorAdjunctionWitness 27
+prfMultisetTensorAdjunctionRank27 = Refl
+
+||| Verified multiset tensor carrying compile-time erased rank witness.
+public export
+record VerifiedTensorAdjunction (dim : Nat) (a : Type) (b : Type) where
+  constructor MkVerifiedTensor
+  tensor : MultisetTensor a b
+  0 rankPrf : TensorAdjunctionWitness dim
+
+------------------------------------------------------------------------
+-- 2. DEFORESTED MULTISET TENSOR STREAM TRANSDUCERS
+------------------------------------------------------------------------
+
+||| Discrete multiset tensor step record.
+public export
+record MultisetTensorStep where
+  constructor MkTensorStep
+  stepId : Int
+  weight : BoxInt
+
+public export
+Eq MultisetTensorStep where
+  (MkTensorStep id1 w1) == (MkTensorStep id2 w2) =
+    id1 == id2 && w1 == w2
+
+||| O(1) allocation deforested stream transducer evaluating total weight across multiset tensor elements.
+public export covering
+fusedMultisetTensorStream : Fuel -> MultisetTensor a b -> BoxInt
+fusedMultisetTensorStream f tensor =
+  fusedHylomorphism f
+    (\(idx, st) => case st of
+                     ZeroM => Done
+                     AddM (_, _) w rest => Yield (MkTensorStep idx w) (idx + 1, rest))
+    (\step, acc => weight step + acc)
+    (intToBoxInt 0)
+    (1, tensor)
+
+||| O(1) allocation deforested stream transducer evaluating total trace sum over diagonal multiset tensor elements.
+public export covering
+fusedComputeTensorTrace : Eq a => Fuel -> MultisetTensor a a -> BoxInt
+fusedComputeTensorTrace f tensor =
+  fusedHylomorphism f
+    (\(idx, st) => case st of
+                     ZeroM => Done
+                     AddM (x, y) w rest =>
+                       if x == y
+                         then Yield (MkTensorStep idx w) (idx + 1, rest)
+                         else Skip (idx + 1, rest))
+    (\step, acc => weight step + acc)
+    (intToBoxInt 0)
+    (1, tensor)
+

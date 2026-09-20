@@ -24,13 +24,30 @@ natAdd (S k) y = S (natAdd k y)
 --------------------------------------------------------------------------------
 
 ||| Pre-ordered Monoid interface combining a monoidal structure with a compatible preorder (<=)
+||| equipped with proof-based PreorderRel relation.
 public export
 interface Monoid a => PreorderedMonoid a where
   ||| Reflexive and transitive pre-order relation
   preorder : a -> a -> Bool
+
+  ||| Proof-based pre-order relation witness: preorder x y = True
+  0 PreorderRel : a -> a -> Type
   
   ||| Monotonicity axiom: a <= b => a + c <= b + c
   monotonicStep : (x : a) -> (y : a) -> (z : a) -> preorder x y = True -> preorder (x <+> z) (y <+> z) = True
+
+  PreorderRel x y = preorder x y = True
+
+--------------------------------------------------------------------------------
+-- 3. PREORDERED CATEGORY FUNCTOR & PROOF TRANSPORT
+--------------------------------------------------------------------------------
+
+||| Preordered Category Functor transporting thermodynamic state orderings across scale jumps.
+public export
+record PreorderedFunctor (0 m1 : Type) (0 m2 : Type) {auto p1 : PreorderedMonoid m1} {auto p2 : PreorderedMonoid m2} where
+  constructor MkPreorderedFunctor
+  mapState : m1 -> m2
+  0 mapOrder : {x, y : m1} -> PreorderRel @{p1} x y -> PreorderRel @{p2} (mapState x) (mapState y)
 
 --------------------------------------------------------------------------------
 -- 3. POSET DIRECTIONAL STEP EVALUATION
