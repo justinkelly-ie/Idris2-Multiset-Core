@@ -19,6 +19,13 @@ natAdd : Nat -> Nat -> Nat
 natAdd Z y = y
 natAdd (S k) y = S (natAdd k y)
 
+||| Monomorphic subtraction for Nat reducing at compile time without typeclass dispatch.
+%inline public export
+natSub : Nat -> Nat -> Nat
+natSub Z _ = Z
+natSub a Z = a
+natSub (S k) (S j) = natSub k j
+
 --------------------------------------------------------------------------------
 -- 2. BOUNDED PRE-ORDERED MONOIDS & POSETS
 --------------------------------------------------------------------------------

@@ -44,6 +44,18 @@ addBox (MkBoxInt a) (MkBoxInt b) = MkBoxInt (a + b)
 subBox : BoxInt -> BoxInt -> BoxInt
 subBox (MkBoxInt a) (MkBoxInt b) = MkBoxInt (a - b)
 
+%inline public export
+mulBox : BoxInt -> BoxInt -> BoxInt
+mulBox (MkBoxInt a) (MkBoxInt b) = MkBoxInt (a * b)
+
+%inline public export
+boxEq : BoxInt -> BoxInt -> Bool
+boxEq (MkBoxInt a) (MkBoxInt b) = a == b
+
+%inline public export
+boxLTE : BoxInt -> BoxInt -> Bool
+boxLTE (MkBoxInt a) (MkBoxInt b) = a <= b
+
 public export
 addBoxLinear : (1 a : BoxInt) -> (1 b : BoxInt) -> BoxInt
 addBoxLinear (MkBoxInt a) (MkBoxInt b) = MkBoxInt (a + b)
