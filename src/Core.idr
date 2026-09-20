@@ -15,6 +15,7 @@ import public Core.Category.Adjunction
 import public Core.TypeTheory.TwoLevel
 import public Core.TypeTheory.ThreeLevel
 import public Math.PrimeMultiset
+import public Math.OnSeq.FusedStream
 
 %default total
 
