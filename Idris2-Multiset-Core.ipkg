@@ -1,13 +1,15 @@
 package Idris2-Multiset-Core
-version = 0.3.1
+version = 0.3.3
 authors = "Justin Kelly"
 brief   = "Layer 0 Ground Linear QTT Multiset Memory Kernel."
 
 depends = base, linear
 sourcedir = "src"
 
-modules = Core.BoxInt,
+modules = Core,
+          Core.BoxInt,
           Core.Category.Adjunction,
+
           Core.Category.Adjunction2,
           Core.ConjugateHylo,
           Core.Multiset,
@@ -19,6 +21,7 @@ modules = Core.BoxInt,
           Core.FourGeometries,
           Core.ScaleTransform,
           Core.TypeTheory.TwoLevel,
+          Core.TypeTheory.ThreeLevel,
           Core.UnixelFraction,
           Core.VexelMaxel,
           Math.BoxInt,
@@ -30,7 +33,9 @@ modules = Core.BoxInt,
           Math.Interfaces,
           Math.LMultiset,
           Math.Multiset,
+          Math.PrimeMultiset,
           Math.OnSeq.OnMSet,
+
           Math.OnSeq.FusedStream,
           Math.OnSeq.FusedStreamBenchmark,
           Math.Pixel,

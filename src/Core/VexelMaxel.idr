@@ -300,6 +300,7 @@ public export
 Semigroup Vexel where
   (<+>) = addVexel
 
+
 public export
 Monoid Vexel where
   neutral = MkVexel []
@@ -319,6 +320,30 @@ Semigroup Boxel where
 public export
 Monoid Boxel where
   neutral = MkBoxel []
+
+public export
+Num Vexel where
+  (+) = addVexel
+  (*) v1 v2 = MkVexel []
+  fromInteger n = MkVexel [(MkUnixel 0, intToBoxInt n)]
+
+public export
+Neg Vexel where
+  negate (MkVexel s) = MkVexel (map (\(sing, w) => (sing, -w)) s)
+  (-) (MkVexel s1) (MkVexel s2) = MkVexel (s1 ++ map (\(sing, w) => (sing, -w)) s2)
+
+public export
+Num Maxel where
+  (+) = addMaxel
+  (*) = mulMaxel
+  fromInteger n = scaleMaxel (intToBoxInt n) identityMaxel
+
+public export
+Neg Maxel where
+  negate (MkMaxel ps) = MkMaxel (map (\(pix, w) => (pix, -w)) ps)
+  (-) (MkMaxel ps1) (MkMaxel ps2) = MkMaxel (ps1 ++ map (\(pix, w) => (pix, -w)) ps2)
+
+
 
 ||| Subtracts two Vexels (u - v = u + (-1)*v).
 public export

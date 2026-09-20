@@ -139,10 +139,6 @@ divUnixelFraction (MkUnixelFraction n1 (MkUnixel d1)) (MkUnixelFraction n2 (MkUn
       signAdj = if unwrapBox n2 < 0 then -1 else 1
   in mkUnixelFraction (newNum * intToBoxInt signAdj) (d1 * dDenom)
 
-||| Deprecated alias for divUnixelFraction. Use divUnixelFraction directly.
-public export
-divSingFraction : UnixelFraction -> UnixelFraction -> UnixelFraction
-divSingFraction = divUnixelFraction
 
 ||| Rational Equality via cross-multiplication: n1 * d2 == n2 * d1
 public export
@@ -179,10 +175,6 @@ public export
 linearConsumeUnixelFraction : (1 frac : UnixelFraction) -> UnixelFraction
 linearConsumeUnixelFraction (MkUnixelFraction n d) = MkUnixelFraction n d
 
-||| Deprecated alias for linearConsumeUnixelFraction.
-public export
-linearConsumeSingFraction : (1 frac : UnixelFraction) -> UnixelFraction
-linearConsumeSingFraction = linearConsumeUnixelFraction
 
 ||| Linear scaling of a fractional multiset by a linear BoxInt factor.
 public export
@@ -190,10 +182,6 @@ linearScaleUnixelFraction : (1 frac : UnixelFraction) -> (1 scale : BoxInt) -> U
 linearScaleUnixelFraction (MkUnixelFraction (MkBoxInt n) d) (MkBoxInt s) =
   MkUnixelFraction (MkBoxInt (s * n)) d
 
-||| Deprecated alias for linearScaleUnixelFraction.
-public export
-linearScaleSingFraction : (1 frac : UnixelFraction) -> (1 scale : BoxInt) -> UnixelFraction
-linearScaleSingFraction = linearScaleUnixelFraction
 
 ||| Linearly split a UnixelFraction into two parts according to an integer partition p.
 ||| Conserves total numerator energy: p + (n - p) == n.
@@ -202,10 +190,6 @@ linearSplitUnixelFraction : (1 frac : UnixelFraction) -> (p : BoxInt) -> (Unixel
 linearSplitUnixelFraction (MkUnixelFraction (MkBoxInt n) d) (MkBoxInt p) =
   (MkUnixelFraction (MkBoxInt p) d, MkUnixelFraction (MkBoxInt (n - p)) d)
 
-||| Deprecated alias for linearSplitUnixelFraction.
-public export
-linearSplitSingFraction : (1 frac : UnixelFraction) -> (p : BoxInt) -> (UnixelFraction, UnixelFraction)
-linearSplitSingFraction = linearSplitUnixelFraction
 
 ------------------------------------------------------------------------
 -- 4. CONTINUED FRACTIONS & OPTIMAL RATIONAL CONVERGENTS
@@ -279,10 +263,6 @@ mediantUnixelFraction (MkUnixelFraction (MkBoxInt n1) (MkUnixel d1))
       newDen = d1 + d2
   in mkUnixelFraction newNum newDen
 
-||| Deprecated alias for mediantUnixelFraction. Use mediantUnixelFraction directly.
-public export
-mediantSingFraction : UnixelFraction -> UnixelFraction -> UnixelFraction
-mediantSingFraction = mediantUnixelFraction
 
 ||| Converts an exact UnixelFraction to a Stern-Brocot binary path of branch directions.
 ||| Uses explicit fuel to guarantee total constructivist termination.

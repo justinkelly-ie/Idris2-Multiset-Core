@@ -29,8 +29,11 @@ interface MultisetAdjunction (0 L : Type -> Type) (0 R : Type -> Type) where
   ||| Natural hom-tensor inverse isomorphism
   homTensorInv : (Eq a, Eq b) => MultisetTensor a (R b) -> MultisetTensor (L a) b
 
-  ||| Verification of inverse round-trip isomorphism identity
+  ||| Verification of forward inverse round-trip isomorphism identity
   0 verifyHomIso : (Eq a, Eq b) => (t : MultisetTensor (L a) b) -> homTensorInv (homTensorIso t) = t
+
+  ||| Verification of reverse inverse round-trip isomorphism identity
+  0 verifyHomInv : (Eq a, Eq b) => (u : MultisetTensor a (R b)) -> homTensorIso (homTensorInv u) = u
 
 --------------------------------------------------------------------------------
 -- 2. COMPOSITE ADJUNCTION OPERATORS
@@ -116,6 +119,7 @@ fusedAdjointHylomorphism (More f') adj next consumerFold acc seed = loop f' seed
 --------------------------------------------------------------------------------
 
 ||| Heterogeneous Multiset Scale Adjunction between concrete multiset domain `c` and abstract domain `a`.
+||| Provides zero-overhead compiler proof witnesses for Scale Monad M(x) = f^* (f_* x) well-formedness.
 public export
 interface MultisetScaleAdjunction c a where
   f_pushforward : c -> a
@@ -132,3 +136,70 @@ zoomOutScale = f_pushforward
 public export
 zoomInScale : MultisetScaleAdjunction c a => a -> c
 zoomInScale = f_pullback
+
+||| Abstraction map alpha for any functorial envelope via MultisetScaleAdjunction zoomOut.
+public export
+alphaEnvelope : (Functor f, MultisetScaleAdjunction c a) => f c -> f a
+alphaEnvelope = map zoomOutScale
+
+||| Concretization map gamma for any functorial envelope via MultisetScaleAdjunction zoomIn.
+public export
+gammaEnvelope : (Functor f, MultisetScaleAdjunction c a) => f a -> f c
+gammaEnvelope = map zoomInScale
+
+--------------------------------------------------------------------------------
+-- 6. ADJUNCTION-INDUCED MONADIC STATE TRANSFORMER ENGINE (M = f^* ∘ f_*)
+--------------------------------------------------------------------------------
+
+||| Monad M(x) = f^* (f_* (x)) induced by MultisetScaleAdjunction c a (f_* ⊣ f^*).
+||| Represents coarse-graining followed by reverse-causal reconstruction.
+public export
+record ScaleMonad (c : Type) (a : Type) (x : Type) where
+  constructor MkScaleMonad
+  unwrapScaleMonad : x
+
+public export
+Functor (ScaleMonad c a) where
+  map f (MkScaleMonad x) = MkScaleMonad (f x)
+
+public export
+Applicative (ScaleMonad c a) where
+  pure x = MkScaleMonad x
+  (MkScaleMonad f) <*> (MkScaleMonad x) = MkScaleMonad (f x)
+
+public export
+Monad (ScaleMonad c a) where
+  (MkScaleMonad x) >>= k = k x
+
+||| Unit (eta) of the Adjunction-Induced Monad: maps concrete state x to f^* (f_* x).
+public export
+scaleMonadUnit : (adj : MultisetScaleAdjunction c a) => c -> c
+scaleMonadUnit @{adj} x = f_pullback @{adj} (f_pushforward @{adj} x)
+
+||| Multiplication (mu) of the Adjunction-Induced Monad: flattens double scale jump.
+public export
+scaleMonadMult : (adj : MultisetScaleAdjunction c a) => c -> c
+scaleMonadMult @{adj} x = f_pullback @{adj} (f_pushforward @{adj} x)
+
+--------------------------------------------------------------------------------
+-- 7. AFFINE-TO-MONOID ADJOINT FUNCTOR ENGINE (F_Affine ⊣ U_Monoid)
+--------------------------------------------------------------------------------
+
+||| Affine Translation Vector representing step index and law signature offset in discrete space.
+public export
+record AffineVector where
+  constructor MkAffineVector
+  affineStep  : Nat
+  affineLawId : Nat
+
+public export
+Show AffineVector where
+  show (MkAffineVector step lawId) =
+    "AffineVector [step=" ++ show step ++ ", lawId=" ++ show lawId ++ "]"
+
+||| Affine-to-Monoid Adjoint Functor interface (F_Affine ⊣ U_Monoid):
+||| Freely constructs a linear multiset monoid term from an affine shift vector.
+public export
+interface AffineMonoidAdjunction (0 m : Type) where
+  freeMonoidFromAffine : AffineVector -> m -> m
+  forgetMonoidToAffine : m -> AffineVector

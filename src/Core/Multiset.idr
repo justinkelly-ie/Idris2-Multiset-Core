@@ -408,6 +408,15 @@ unionBox (MkBox []) ys = ys
 unionBox (MkBox ((x, w) :: xs)) ys =
   insertBox x w (unionBox (MkBox xs) ys)
 
+public export
+Eq a => Semigroup (Box a) where
+  (<+>) = unionBox
+
+public export
+Eq a => Monoid (Box a) where
+  neutral = emptyBox
+
+
 ||| Multiset Difference: subtracts multiplicities (bounded below by 0).
 %inline
 public export

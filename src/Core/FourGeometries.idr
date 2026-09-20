@@ -1,6 +1,8 @@
 module Core.FourGeometries
 
 import Core.BoxInt
+import Core.ScaleTransform
+import Data.Fin
 
 %default total
 
@@ -24,6 +26,29 @@ Show ColorCharge where
   show RedColor   = "Red"
   show GreenColor = "Green"
   show BlueColor  = "Blue"
+
+public export
+ScaleTransform ColorCharge Nat where
+  scaleTransform RedColor   = 1
+  scaleTransform GreenColor = 2
+  scaleTransform BlueColor  = 3
+
+public export
+InvertibleScaleTransform ColorCharge Nat where
+  invertScaleTransform Z = RedColor
+  invertScaleTransform (S Z) = RedColor
+  invertScaleTransform (S (S Z)) = GreenColor
+  invertScaleTransform (S (S (S _))) = BlueColor
+
+||| Classifies each cell index in Fin 27 into its exact QCD Color Sector.
+||| Uses the Z-axis coordinate layer (z = -1 -> Red, z = 0 -> Green, z = +1 -> Blue).
+public export
+cellColorSector : Fin 27 -> ColorCharge
+cellColorSector idx =
+  case (finToNat idx) `div` 9 of
+    0 => RedColor
+    1 => GreenColor
+    _ => BlueColor
 
 ||| The 4 canonical metric geometries governing space, time, gauge, and causality:
 ||| 1. EllipticGeom   (Blue Sector  / det g = +1 / Spacelike Confinement Canvas)

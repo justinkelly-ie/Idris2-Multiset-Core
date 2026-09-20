@@ -30,10 +30,12 @@ record Multiset2Adjunction (0 L : Type -> Type) (0 R : Type -> Type) where
   counit2Morphism : {a : Type} -> L (R a) -> a
 
   ||| Left triangle identity witness: ε₂ L . L η₂ = id_L
-  0 verifyLeftTriangle2Iso : {a : Type} -> (x : L a) -> x = x
+  0 verifyLeftTriangle2Iso : {a : Type} -> (x : L a) -> 
+    counit2Morphism (leftAdjoint @{baseAdjunction} (unit2Morphism (rightAdjoint @{baseAdjunction} x))) = x
 
   ||| Right triangle identity witness: R ε₂ . η₂ R = id_R
-  0 verifyRightTriangle2Iso : {a : Type} -> (y : R a) -> y = y
+  0 verifyRightTriangle2Iso : {a : Type} -> (y : R a) -> 
+    rightAdjoint @{baseAdjunction} (counit2Morphism (leftAdjoint @{baseAdjunction} (unit2Morphism y))) = y
 
 --------------------------------------------------------------------------------
 -- 2. 2-CATEGORY TRIANGLE IDENTITY AUDITOR WITNESS
@@ -42,5 +44,6 @@ record Multiset2Adjunction (0 L : Type -> Type) (0 R : Type -> Type) where
 ||| Compiler proof witness verifying 2-category triangle identity soundness.
 public export
 0 verify2AdjunctionSoundness : (adj2 : Multiset2Adjunction l r) -> 
-                              {a : Type} -> (x : l a) -> x = x
+                              {a : Type} -> (x : l a) -> 
+                              counit2Morphism adj2 (leftAdjoint @{adj2.baseAdjunction} (unit2Morphism adj2 (rightAdjoint @{adj2.baseAdjunction} x))) = x
 verify2AdjunctionSoundness adj2 x = verifyLeftTriangle2Iso adj2 x

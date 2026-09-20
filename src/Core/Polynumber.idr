@@ -158,6 +158,27 @@ public export
 evalPolynumber : Polynumber -> BoxInt -> BoxInt
 evalPolynumber (MkPolynumber cs) a = evalPolyList cs a
 
+public export
+Num Polynumber where
+  (+) = addPolynumber
+  (*) = mulPolynumber
+  fromInteger n = constantPolynumber (intToBoxInt n)
+
+public export
+Neg Polynumber where
+  negate p = scalePolynumber (intToBoxInt (-1)) p
+  (-) = subPolynumber
+
+public export
+Semigroup Polynumber where
+  (<+>) = addPolynumber
+
+public export
+Monoid Polynumber where
+  neutral = zeroPolynumber
+
+
+
 ------------------------------------------------------------------------
 -- 1b. FORMAL POLYNOMIAL DIFFERENTIATION ALGEBRA
 ------------------------------------------------------------------------
