@@ -2,7 +2,7 @@ module Math.Singleton.Bit
 
 import Data.Linear
 import Math.Interfaces
-import Math.BoxInt
+import public Math.BoxInt
 import public Math.Multiset
 import public Math.Singleton.Sing
 
@@ -38,7 +38,6 @@ Eq Bit where
   _              == _              = True
 
 public export
-[overlapping]
 Show Bit where
   show b = if isOne b then "1" else "0"
 

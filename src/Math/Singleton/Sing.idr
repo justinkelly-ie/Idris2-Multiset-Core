@@ -16,7 +16,7 @@ Eq a => Eq (Sing a) where
   (MkSing x) == (MkSing y) = x == y
 
 public export
-Show a => Show (Sing a) where
+[singShow] Show a => Show (Sing a) where
   show (MkSing x) = "{" ++ show x ++ "}"
 
 public export

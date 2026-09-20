@@ -6,6 +6,10 @@ import Math.Interfaces
 
 %default total
 
+------------------------------------------------------------------------
+-- 1. MULTISET DATA CONSTRUCTORS
+------------------------------------------------------------------------
+
 ||| A Run-Length Encoded (RLE) Multiset optimized for high-generation Box Arithmetic.
 public export
 data Multiset : (c : Type) -> (a : Type) -> Type where
@@ -86,6 +90,54 @@ public export
 Monoid (Multiset c a) where
   neutral = ZeroM
 
+public export
+scaleMultiset : (Num c, Eq c) => c -> Multiset c a -> Multiset c a
+scaleMultiset scalar xs = if scalar == 0 then ZeroM else go xs
+  where
+    go : Multiset c a -> Multiset c a
+    go ZeroM = ZeroM
+    go (AddM k v rest) = AddM k (v * scalar) (go rest)
+
+public export
+(Num c, Eq c) => Applicative (Multiset c) where
+  pure x = AddM x 1 ZeroM
+
+  ZeroM <*> _ = ZeroM
+  (AddM f vf fs) <*> xs =
+    addMultiset (mapMultiset f (scaleMultiset vf xs)) (fs <*> xs)
+
+public export
+(Num c, Eq c) => Monad (Multiset c) where
+  ZeroM >>= _ = ZeroM
+  (AddM x v xs) >>= f =
+    addMultiset (scaleMultiset v (f x)) (xs >>= f)
+
+public export
+convolveMultiset : (Semigroup a, Num c, Eq c) => Multiset c a -> Multiset c a -> Multiset c a
+convolveMultiset xs ys = [| (<+>) xs ys |]
+
+public export
+fiberPushforward : (a -> b) -> Multiset c a -> Multiset c b
+fiberPushforward = mapMultiset
+
+||| Intuitive zoomOutMultiset operator: coarse-grains fine micro-multiset tokens to coarse macro-multiset tokens (Technical: fiberPushforward / f_push / f_*).
+public export
+zoomOutMultiset : (a -> b) -> Multiset c a -> Multiset c b
+zoomOutMultiset = fiberPushforward
+
+public export
+fiberPullback : (Num c, Eq c) => (b -> List a) -> Multiset c b -> Multiset c a
+fiberPullback fiberMap ZeroM = ZeroM
+fiberPullback fiberMap (AddM y v ys) =
+  let fiberItems = foldr (\x, acc => AddM x v acc) ZeroM (fiberMap y)
+  in addMultiset fiberItems (fiberPullback fiberMap ys)
+
+||| Intuitive zoomInMultiset operator: expands coarse macro-multiset tokens to micro-multiset token fibers (Technical: fiberPullback / f_pull / f^*).
+public export
+zoomInMultiset : (Num c, Eq c) => (b -> List a) -> Multiset c b -> Multiset c a
+zoomInMultiset = fiberPullback
+
+
 
 public export
 annihilateMultiset : (Eq a, Num c, Eq c) => Multiset c a -> Multiset c a
@@ -100,16 +152,22 @@ multiplicityAll : (Num c, Abs c) => Multiset c a -> c
 multiplicityAll ZeroM = 0
 multiplicityAll (AddM x c xs) = abs c + multiplicityAll xs
 
+||| Looks up the total count/multiplicity of element `target` in a `Multiset c a`.
 public export
-scaleMultiset : (Num c, Eq c) => c -> Multiset c a -> Multiset c a
-scaleMultiset scalar xs = if scalar == 0 then ZeroM else go xs
-  where
-    go : Multiset c a -> Multiset c a
-    go ZeroM = ZeroM
-    go (AddM k v rest) = AddM k (v * scalar) (go rest)
+lookupCount : (Eq a, Num c) => a -> Multiset c a -> c
+lookupCount target ZeroM = 0
+lookupCount target (AddM k v rest) =
+  if target == k then v + lookupCount target rest else lookupCount target rest
+
+||| Alias for lookupCount.
+public export
+multiplicity : (Eq a, Num c) => a -> Multiset c a -> c
+multiplicity = lookupCount
+
 
 public export
 negateMultiset : Neg c => Multiset c a -> Multiset c a
+
 negateMultiset ZeroM = ZeroM
 negateMultiset (AddM x c xs) = AddM x (-c) (negateMultiset xs)
 

@@ -1,20 +1,45 @@
 package Idris2-Multiset-Core
-version = 0.1.0
+version = 0.3.1
 authors = "Justin Kelly"
 brief   = "Layer 0 Ground Linear QTT Multiset Memory Kernel."
 
 depends = base, linear
-
-modules = Math.Interfaces
-        , Math.Multiset
-        , Math.BoxInt
-        , Math.Spread
-        , Math.Singleton.Sing
-        , Math.Singleton.Bit
-        , Math.DepMultiset
-        , Math.LMultiset
-        , Core.ScaleTransform
-        , Core.Order.Preorder
-        , Core.Order.GaloisConnection
-
 sourcedir = "src"
+
+modules = Core.BoxInt,
+          Core.Category.Adjunction,
+          Core.Category.Adjunction2,
+          Core.ConjugateHylo,
+          Core.OnSeq,
+          Core.TypeTheory.TwoLevel,
+          Core.Order.Preorder,
+          Core.FourGeometries,
+          Core.MultisetTensor,
+          Core.ScaleTransform,
+          Math.BoxInt,
+
+          Math.BoxNat,
+          Math.DepMaxel,
+          Math.DepMultiset,
+          Math.IntPolynumber,
+          Math.Interfaces,
+          Math.LMultiset,
+          Math.Multiset,
+          Math.OnSeq.OnMSet,
+          Math.OnSeq.FusedStream,
+          Math.OnSeq.FusedStreamBenchmark,
+          Math.Pixel,
+          Math.Polynumber,
+          Math.Singleton.Bit,
+          Math.Singleton.Bit2,
+          Math.Singleton.DepSing,
+          Math.Singleton.SBFMset,
+          Math.Singleton.Sing,
+          Math.Singleton.SingFraction,
+          Math.SignedFraction,
+          Math.Spread,
+          Math.Vexel.Byte,
+          Math.Vexel.DepVexel,
+          Math.Vexel.Transformation,
+          Math.Vexel.Vexel
+

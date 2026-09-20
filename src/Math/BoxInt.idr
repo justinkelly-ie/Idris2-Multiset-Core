@@ -3,6 +3,7 @@ module Math.BoxInt
 import Data.Linear
 import Math.Interfaces
 import public Math.Multiset
+import public Core.BoxInt
 
 %default total
 
@@ -22,15 +23,27 @@ Show SignedUnit where
   show Pos = "+"
   show Neg = "-"
 
-||| A Box Arithmetic Linear Integer (BoxInt)
 public export
-BoxInt : Type
-BoxInt = Multiset Integer SignedUnit
+Semigroup SignedUnit where
+  (<+>) Pos Pos = Pos
+  (<+>) Pos Neg = Neg
+  (<+>) Neg Pos = Neg
+  (<+>) Neg Neg = Pos
 
-||| Normalizes a BoxInt by mutually annihilating Pos and Neg (Dirac Cancellation).
 public export
-normalizeBoxInt : BoxInt -> BoxInt
+Monoid SignedUnit where
+  neutral = Pos
+
+||| A Box Arithmetic Multiset Integer Representation
+public export
+MultisetBoxInt : Type
+MultisetBoxInt = Multiset Integer SignedUnit
+
+||| Normalizes a MultisetBoxInt by mutually annihilating Pos and Neg (Dirac Cancellation).
+public export
+normalizeBoxInt : MultisetBoxInt -> MultisetBoxInt
 normalizeBoxInt xs =
+
   let rle = multisetToList xs
       posCount = foldl (\acc, (u, val) => if u == Pos then acc + val else acc) 0 rle
       negCount = foldl (\acc, (u, val) => if u == Neg then acc + val else acc) 0 rle
@@ -39,110 +52,110 @@ normalizeBoxInt xs =
      else if totalVal > 0 then AddM Pos totalVal ZeroM
      else AddM Neg (-totalVal) ZeroM
 
-||| Safely and linearly unwraps a BoxInt into an unrestricted Integer.
+||| Safely and linearly unwraps a MultisetBoxInt into an unrestricted Integer.
 public export
-boxToInt : (1 _ : BoxInt) -> Ur Integer
+boxToInt : (1 _ : MultisetBoxInt) -> Ur Integer
 boxToInt ZeroM = MkUr 0
-boxToInt (AddM Pos c xs) = 
-  let (MkUr n) = boxToInt xs 
+boxToInt (AddM Pos c xs) =
+  let (MkUr n) = boxToInt xs
   in MkUr (c + n)
-boxToInt (AddM Neg c xs) = 
-  let (MkUr n) = boxToInt xs 
+boxToInt (AddM Neg c xs) =
+  let (MkUr n) = boxToInt xs
   in MkUr (-c + n)
 
-||| Creates a BoxInt from an Integer.
+||| Creates a MultisetBoxInt from an Integer.
 public export
-intToBoxInt : Integer -> BoxInt
-intToBoxInt n = 
+intToMultisetBoxInt : Integer -> MultisetBoxInt
+intToMultisetBoxInt n = 
   if n == 0 then ZeroM
   else if n > 0 then AddM Pos n ZeroM
   else AddM Neg (-n) ZeroM
 
-||| Creates a BoxInt from a Nat count multiset.
+||| Creates a MultisetBoxInt from a Nat count multiset.
 public export
-natToBoxInt : Nat -> BoxInt
-natToBoxInt n = intToBoxInt (cast n)
+natToMultisetBoxInt : Nat -> MultisetBoxInt
+natToMultisetBoxInt n = intToMultisetBoxInt (cast n)
 
-||| Negates a BoxInt.
+||| Negates a MultisetBoxInt.
 public export
-boxNegate : BoxInt -> BoxInt
+boxNegate : MultisetBoxInt -> MultisetBoxInt
 boxNegate ZeroM = ZeroM
 boxNegate (AddM Pos c xs) = AddM Neg c (boxNegate xs)
 boxNegate (AddM Neg c xs) = AddM Pos c (boxNegate xs)
 
-||| Adds two BoxInts.
 public export
+mulSignedUnit : SignedUnit -> SignedUnit -> SignedUnit
+mulSignedUnit Pos Pos = Pos
+mulSignedUnit Pos Neg = Neg
+mulSignedUnit Neg Pos = Neg
+mulSignedUnit Neg Neg = Pos
+
+||| Adds two BoxInts.
+%inline public export
 boxAdd : BoxInt -> BoxInt -> BoxInt
-boxAdd xs ys = normalizeBoxInt (addMultiset xs ys)
+boxAdd = addBox
 
 ||| Subtracts two BoxInts.
-public export
+%inline public export
 boxSub : BoxInt -> BoxInt -> BoxInt
-boxSub xs ys = boxAdd xs (boxNegate ys)
+boxSub = subBox
 
 ||| Multiplies two BoxInts.
-public export
+%inline public export
 boxMult : BoxInt -> BoxInt -> BoxInt
-boxMult xs ys =
-  let (MkUr xVal) = boxToInt xs
-      (MkUr yVal) = boxToInt ys
-  in intToBoxInt (xVal * yVal)
+boxMult (MkBoxInt a) (MkBoxInt b) = MkBoxInt (a * b)
 
+||| Multiplies two MultisetBoxInts via structural Applicative tensor product over SignedUnit group.
 public export
-Num BoxInt where
-  (+) = boxAdd
-  (*) = boxMult
-  fromInteger n = intToBoxInt n
+multisetBoxMult : MultisetBoxInt -> MultisetBoxInt -> MultisetBoxInt
+multisetBoxMult xs ys = normalizeBoxInt [| mulSignedUnit xs ys |]
 
-public export
-Neg BoxInt where
-  negate = boxNegate
-  (-) = boxSub
 
+||| Returns the absolute value of a MultisetBoxInt.
 public export
-Ord BoxInt where
-  compare xs ys =
-    let (MkUr x) = boxToInt xs
-        (MkUr y) = boxToInt ys
-    in compare x y
-
-||| Returns the absolute value of a BoxInt.
-public export
-boxAbs : BoxInt -> BoxInt
-boxAbs xs =
+multisetBoxAbs : MultisetBoxInt -> MultisetBoxInt
+multisetBoxAbs xs =
   let normalized = normalizeBoxInt xs
   in case normalized of
        AddM Neg c rest => AddM Pos c rest
        other => other
 
+||| Discrete ceiling log2 directly over MultisetBoxInt.
 public export
-Abs BoxInt where
-  abs = boxAbs
+multisetBoxLog2 : MultisetBoxInt -> MultisetBoxInt
+multisetBoxLog2 xs =
+  let (MkUr val) = boxToInt (multisetBoxAbs xs)
+  in intToMultisetBoxInt (calcLog2 val)
+  where
+    calcLog2 : Integer -> Integer
+    calcLog2 n =
+      if n <= 1 then 0
+      else 1 + assert_total (calcLog2 (div n 2))
 
 -----------------------------------------------------------------------
--- LINEAR INSTANCES
+-- LINEAR INSTANCES FOR MULTISETBOXINT
 -----------------------------------------------------------------------
 
 public export
-implementation LConsumable BoxInt where
+implementation LConsumable MultisetBoxInt where
   lconsume = consumeMultiset
 
 public export
-implementation LComonoid BoxInt where
+implementation LComonoid MultisetBoxInt where
   lcomult ZeroM = Builtin.(#) ZeroM ZeroM
   lcomult (AddM u c rest) =
     let Builtin.(#) r1 r2 = lcomult rest
     in Builtin.(#) (AddM u c r1) (AddM u c r2)
 
 public export
-implementation LEq BoxInt where
+implementation LEq MultisetBoxInt where
   lEq ZeroM ZeroM = Builtin.(#) True (Builtin.(#) ZeroM ZeroM)
   lEq (AddM u1 c1 r1) (AddM u2 c2 r2) =
     let Builtin.(#) subRes (Builtin.(#) r1' r2') = lEq r1 r2
-        headMatch = (u1 == u2) && (c1 == c2)
-        finalRes = if headMatch then subRes else case lconsume subRes of () => False
-    in Builtin.(#) finalRes (Builtin.(#) (AddM u1 c1 r1') (AddM u2 c2 r2'))
+        eqUnits = u1 == u2 && c1 == c2 && subRes
+    in Builtin.(#) eqUnits (Builtin.(#) (AddM u1 c1 r1') (AddM u2 c2 r2'))
   lEq x y = Builtin.(#) False (Builtin.(#) x y)
+
 
 -----------------------------------------------------------------------
 -- TYPE-REFINED NON-ZERO BOXINT
@@ -156,6 +169,7 @@ record NonZeroBoxInt where
 public export
 toNonZeroBoxInt : BoxInt -> Maybe NonZeroBoxInt
 toNonZeroBoxInt b =
-  let (MkUr n) = boxToInt b
+  let n = unwrapBox b
   in if n == 0 then Nothing
      else Just (MkNonZeroBoxInt b)
+
