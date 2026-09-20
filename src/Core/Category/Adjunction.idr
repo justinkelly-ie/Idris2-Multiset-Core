@@ -181,6 +181,14 @@ public export
 scaleMonadMult : (adj : MultisetScaleAdjunction c a) => c -> c
 scaleMonadMult @{adj} x = f_pullback @{adj} (f_pushforward @{adj} x)
 
+||| Evaluates Active Inference Helmholtz Free Energy Surprise F_surprise = S(f^* (f_* x)) - S(x)
+||| induced by ScaleMonad M(x) = f^* (f_* x) under an entropy measure.
+public export
+scaleMonadVariationalSurprise : (adj : MultisetScaleAdjunction c a) => (c -> BoxInt) -> c -> BoxInt
+scaleMonadVariationalSurprise @{adj} entropyMeasure x =
+  let reconstructed = scaleMonadUnit @{adj} x
+  in subBox (entropyMeasure reconstructed) (entropyMeasure x)
+
 --------------------------------------------------------------------------------
 -- 7. AFFINE-TO-MONOID ADJOINT FUNCTOR ENGINE (F_Affine ⊣ U_Monoid)
 --------------------------------------------------------------------------------
