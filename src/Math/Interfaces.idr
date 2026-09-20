@@ -1,8 +1,17 @@
 module Math.Interfaces
 
 import Data.Linear
+import Core.BoxInt
 
 %default total
+
+||| Vector/Matrix/Tensor Multiset Algebra interface with zero, addition, scaling, and inner product.
+public export
+interface MultisetAlgebra a where
+  zeroM  : a
+  addM   : a -> a -> a
+  scaleM : BoxInt -> a -> a
+  dotM   : a -> a -> BoxInt
 
 public export
 implementation (Show a, Show b) => Show (LPair a b) where
@@ -107,7 +116,3 @@ implementation (LEq a, LEq b) => LEq (LPair a b) where
 public export
 data Ur : Type -> Type where
   MkUr : a -> Ur a
-
-public export
-integerToNat : Integer -> Nat
-integerToNat n = if n < 0 then Z else cast n

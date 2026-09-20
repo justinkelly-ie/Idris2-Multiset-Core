@@ -134,7 +134,7 @@ public export
 fromBoxIntPair : (BoxInt, BoxInt) -> MSetFraction
 fromBoxIntPair (n, d) =
   let dVal = unwrapBox d
-      posD = mkPosNat (Math.Interfaces.integerToNat (abs dVal))
+      posD = mkPosNat (integerToNat (abs dVal))
   in MkMSF n posD
 
 

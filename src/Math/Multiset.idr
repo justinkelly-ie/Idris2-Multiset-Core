@@ -2,7 +2,7 @@ module Math.Multiset
 
 import Data.List
 import Data.Linear
-import Math.Interfaces
+import public Math.Interfaces
 
 %default total
 

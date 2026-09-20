@@ -63,20 +63,17 @@ Neg BoxInt where
   negate (MkBoxInt a) = MkBoxInt (-a)
   (-) (MkBoxInt a) (MkBoxInt b) = MkBoxInt (a - b)
 
-||| Pure algebraic interface over multiset state spaces (Vexel, Maxel, Boxel, BoxInt).
 public export
-interface MultisetAlgebra m where
-  zeroM  : m
-  addM   : m -> m -> m
-  scaleM : BoxInt -> m -> m
-  dotM   : m -> m -> BoxInt
+Abs BoxInt where
+  abs (MkBoxInt v) = MkBoxInt (if v < 0 then -v else v)
 
 public export
-implementation MultisetAlgebra BoxInt where
-  zeroM = MkBoxInt 0
-  addM a b = a + b
-  scaleM s x = s * x
-  dotM a b = a * b
+Cast Nat BoxInt where
+  cast = natToBoxInt
+
+public export
+Cast Integer BoxInt where
+  cast = intToBoxInt
 
 ||| Converts a BoxInt absolute value to Nat without typeclass dispatch.
 %inline public export
@@ -85,6 +82,10 @@ boxToNat (MkBoxInt v) =
   case integerToNat v of
     Z => integerToNat (-v)
     S k => S k
+
+public export
+Cast BoxInt Nat where
+  cast = boxToNat
 
 ||| Computes absolute value of a BoxInt natively without typeclass dispatch.
 %inline public export

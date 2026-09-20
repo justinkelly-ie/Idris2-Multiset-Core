@@ -134,6 +134,16 @@ foldStream {a, b} f acc0 (MkStream {s} next seed) = loop seed acc0
       Skip st' => loop st' acc
       Yield x st' => loop st' (f acc x)
 
+public export
+Applicative FusedStream where
+  pure x = unfoldStream (\b => if b then Yield x False else Done) True
+  fs <*> xs = mapStream (\(f, x) => f x) (zipWithStream (\f, x => (f, x)) fs xs)
+
+public export covering
+Foldable FusedStream where
+  foldr f z st = foldStream (flip f) z st
+  foldl f z st = foldStream f z st
+
 ||| Deforested stream take operator.
 %inline public export
 fusedTake : Nat -> FusedStream a -> FusedStream a
