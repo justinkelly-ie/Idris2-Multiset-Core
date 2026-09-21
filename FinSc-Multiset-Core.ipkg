@@ -1,4 +1,4 @@
-package Idris2-Multiset-Core
+package FinSc-Multiset-Core
 version = 0.3.3
 authors = "Justin Kelly"
 brief   = "Layer 0 Ground Linear QTT Multiset Memory Kernel."
